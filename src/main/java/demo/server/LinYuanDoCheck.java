@@ -27,11 +27,11 @@ public class LinYuanDoCheck {
 
         Map<String, String> map;
 
-        int caseNum = 2;
+        int caseNum = ExcelTest.getRowNum(FileManage.linyuanADcasePath, LinyuanMakeCase.sheetName);
 
         int caseWrongNum = 0;
 
-        for (int i = 1; i <= caseNum; i++) {
+        for (int i = 1; i <= caseNum-1; i++) {
 
             //获取Excel中数据，拼装成map
             map = LinyuanMakeCase.getPolicy(i);

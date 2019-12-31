@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class LinyuanMakeCase {
 
-    private static String sheetName = "整理分割";
+    public static String sheetName = "整理分割";
 
     public static void main(String[] args) throws Exception {
 
@@ -39,7 +39,7 @@ public class LinyuanMakeCase {
 
         int columnNum;
 
-        columnNum = ExcelTest.getColumnNum(FileManage.linyuanADcasePath, sheetName);
+        columnNum = ExcelTest.getColumnNum(FileManage.linyuanADcasePath, LinyuanMakeCase.sheetName);
 
         XSSFSheet excelWSheet = initExcel();
 
