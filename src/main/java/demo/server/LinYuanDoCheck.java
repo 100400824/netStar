@@ -2,6 +2,7 @@ package demo.server;
 
 import com.alibaba.fastjson.JSON;
 import demo.PublicTool.*;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,11 +28,13 @@ public class LinYuanDoCheck {
 
         Map<String, String> map;
 
-        int caseNum = ExcelTest.getRowNum(FileManage.linyuanADcasePath, LinyuanMakeCase.sheetName);
+        int caseNum =                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ExcelTest.getRowNum(FileManage.linyuanADcasePath, LinyuanMakeCase.sheetName);
+
+        caseNum = 3;
 
         int caseWrongNum = 0;
 
-        for (int i = 1; i <= caseNum-1; i++) {
+        for (int i = 1; i <= caseNum - 1; i++) {
 
             //获取Excel中数据，拼装成map
             map = LinyuanMakeCase.getPolicy(i);
@@ -51,6 +54,7 @@ public class LinYuanDoCheck {
 
             String uid = UUID.randomUUID().toString().replace("-", "");
 
+            //redis中生成规则
             for (String key : policyMap.keySet()) {
 
                 if (key.contains("1") || key.contains("0")) {
@@ -61,29 +65,36 @@ public class LinYuanDoCheck {
                     redisMap = doPolicy(key, policyMap.get(key), uid, cpid, billingname);
 
                     //设置Redis
-                    RedisTool.setRedis(redisMap,"192.168.11.170",30000);
+                    RedisTool.setRedis(redisMap, "192.168.11.170", 30000);
                 }
             }
 
-            //请求点击校准接口
-            String entityStr = getClieckInfo(uid, cpid, billingname);
-
-            //执行JS
-            String[] jsResult = TestJS.doJs(entityStr);
-
-            Boolean checkStatus = LinYuanVerify.checkADResult(jsResult, verifyMap, policyMap);
+            Boolean checkStatus = testAD(uid, cpid, billingname, verifyMap, policyMap, i);
 
             if (!checkStatus) {
 
                 caseWrongNum++;
             }
-
-            PrintResult.printSomething(checkStatus, "" + i, jsResult, verifyMap);
-
         }
 
         System.out.println("失败case数量" + caseWrongNum);
     }
+
+    private static Boolean testAD(String uid, String cpid, String billingname, Map<String, String> verifyMap, Map<String, String> policyMap, int i) throws Exception {
+
+        //请求点击校准接口
+        String entityStr = getClieckInfo(uid, cpid, billingname);
+
+        //执行JS
+        String[] jsResult = TestJS.doJs(entityStr);
+
+        Boolean checkStatus = LinYuanVerify.checkADResult(jsResult, verifyMap, policyMap);
+
+        PrintResult.printSomething(checkStatus, "" + i, jsResult, verifyMap);
+
+        return checkStatus;
+    }
+
 
     private static String getClieckInfo(String uid, String cpid, String billingname) throws Exception {
 
